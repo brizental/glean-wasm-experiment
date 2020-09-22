@@ -1,0 +1,11 @@
+[package]
+name = "rkv-and-wasm"
+version = "0.1.0"
+authors = ["brizental <beatriz.rizental@gmail.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+rkv = "0.15.0"
