@@ -1,6 +1,6 @@
 # Compile glean-core to WASM experiment
 
-I did not have success compiling the whole thing to WASM, but I was able to compile the histograms part and try it out in the ditributions simulator.
+I did not have success compiling the whole thing to WASM, but I was able to compile the histograms part and try it out in the distributions simulator.
 
 This repo is the result of that.
 

@@ -20,11 +20,11 @@ pub fn accumulate_samples_custom_distribution(
     range_max: u32,
     bucket_count: usize,
     histogram_type: i32,
-    samples: Vec<u32>,
+    samples: Vec<u64>,
 ) -> String {
-    fn accumulate<B: Bucketing>(samples: &[u32], mut hist: Histogram<B>) -> Histogram<B> {
+    fn accumulate<B: Bucketing>(samples: &[u64], mut hist: Histogram<B>) -> Histogram<B> {
         for &sample in samples.iter() {
-            hist.accumulate(sample as u64);
+            hist.accumulate(sample);
         }
         hist
     }
@@ -46,7 +46,7 @@ pub fn accumulate_samples_custom_distribution(
 }
 
 #[wasm_bindgen]
-pub fn accumulate_samples_timing_distribution(time_unit: i32, samples: Vec<u32>) -> String {
+pub fn accumulate_samples_timing_distribution(time_unit: i32, samples: Vec<u64>) -> String {
     // The base of the logarithm used to determine bucketing
     const LOG_BASE: f64 = 2.0;
 
@@ -84,7 +84,7 @@ pub fn accumulate_samples_timing_distribution(time_unit: i32, samples: Vec<u32>)
 }
 
 #[wasm_bindgen]
-pub fn accumulate_samples_memory_distribution(memory_unit: i32, samples: Vec<u32>) -> String {
+pub fn accumulate_samples_memory_distribution(memory_unit: i32, samples: Vec<u64>) -> String {
     // The base of the logarithm used to determine bucketing
     const LOG_BASE: f64 = 2.0;
 

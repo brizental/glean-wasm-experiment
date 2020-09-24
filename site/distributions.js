@@ -144,7 +144,7 @@ function buildData (Glean, distType, kind, props, dataOption, customData) {
  * @param {Number} lower The lowest number the generated values may be, defaults to `1`
  * @param {Number} upper The highest number the generated values may be, defaults to `100`
  *
- * @returns {Array} An array of values, this array has DATA_SAMPLE_COUNT length if not custom
+ * @returns {BigUint64Array} An array of values, this array has DATA_SAMPLE_COUNT length if not custom
  */
 function buildSampleData (dataOption, customData, lower, upper) {
     if (!lower) lower = 1;
@@ -154,7 +154,10 @@ function buildSampleData (dataOption, customData, lower, upper) {
         : dataOption == "log-normally-distributed" ? logNormalRandomValues(Math.sqrt(Math.max(lower, 1) * upper), Math.pow(upper / Math.max(lower, 1), 1 / 8), DATA_SAMPLE_COUNT)
         : dataOption == "uniformly-distributed" ? uniformValues(lower, upper, DATA_SAMPLE_COUNT)
         : parseJSONString(customData);
-    return values;
+
+    let result = new BigUint64Array(DATA_SAMPLE_COUNT);
+    values.forEach((value, index) => result[index] = BigInt(value))
+    return result;
 }
 
 /**
@@ -222,11 +225,17 @@ function buildDataFunctional(Glean, distType, props, dataOption, customData) {
     const data = Object.values(result);
     const buckets = Object.keys(result);
 
+    let sum = BigInt(0);
+    for (const value of values) {
+        sum += value;
+    }
+    const mean = sum / BigInt(values.length);
+
     return {
         data,
         buckets,
         percentages: data.map(v => v * 100 / values.length),
-        mean: values.reduce((sum, current) => sum + current) / values.length
+        mean,
     };
 }
 
@@ -419,11 +428,14 @@ function uniformValues (min, max, count) {
  * @return {String} The formatted number
  */
 function formatNumber(number) {
-    if (number == Infinity) return "Infinity";
-    if (number == -Infinity) return "-Infinity";
-    if (isNaN(number)) return "NaN";
+    // TODO: this is probably not very reliable.
+    const n = Number(number);
 
-    const mag = Math.abs(number);
+    if (n == Infinity) return "Infinity";
+    if (n == -Infinity) return "-Infinity";
+    if (isNaN(n)) return "NaN";
+
+    const mag = Math.abs(n);
     const exponent =
         Math.log10 !== undefined ? Math.floor(Math.log10(mag))
             : Math.floor(Math.log(mag) / Math.log(10));
@@ -436,10 +448,10 @@ function formatNumber(number) {
     };
 
     if (interval in units) {
-        return Math.round(number * 100 / interval) / 100 + units[interval];
+        return Math.round(n * 100 / interval) / 100 + units[interval];
     }
 
-    return Math.round(number * 100) / 100;
+    return Math.round(n * 100) / 100;
 }
 
 module.exports = {
