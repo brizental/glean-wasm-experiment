@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "copy": "cp -f ./{main.css,index.html,custom.html,memory.html,timing.html} ./dist",
+    "mount": "npm run copy && webpack --config webpack.config.js --mode production",
+    "dev": "webpack-dev-server --port 3000",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "chart.js": "^2.9.3",
+    "express": "^4.17.1",
+    "glean-wasm": "file://./glean/",
+    "wasm-loader": "^1.3.0"
+  },
+  "devDependencies": {
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10"
+  }
+}
